@@ -1,0 +1,3 @@
+pyfiglet==0.8.post1
+toml==0.10.2
+ansicolors==1.1.8
