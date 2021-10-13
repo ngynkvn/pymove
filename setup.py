@@ -11,7 +11,7 @@ setup(
     author_email="ngynkvn@gmail.com",
     license="MIT",
     packages=find_packages(),
-    entry_points={"console_scripts": ["pymove = pymove.pymove:main"]},
+    entry_points={"console_scripts": ["pymove = pymove.pymove:cli"]},
     keywords="mv util cli python",
     install_requires=requirements,
     description="A CLI tool for organizing file directories.",

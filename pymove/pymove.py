@@ -4,6 +4,7 @@ import re
 import os
 import toml
 from shutil import move
+from prettytable import PrettyTable
 from pyfiglet import Figlet
 
 f = Figlet(font="slant")
@@ -41,15 +42,17 @@ def validate_config(c):
         else:
             if v not in missing:
                 print(yellow(f"The path {v} does not exist"))
-                missing.append(f"{v}\t[{k}]")
+                missing.append([v, k])
     if not all_good:
         raise ValueError("Configuration was found to be invalid.")
-
     if missing:
-        missing = "\n-".join(missing)
+        table = PrettyTable()
+        table.field_names = ["Target", "Regex"]
+        table.align = "l"
+        table.add_rows(missing)
         response = ask(
             yellow(
-                f"The following paths do not exist currently:\n-{missing}\nAre you okay with PyMover creating these directories?"
+                f"The following paths do not exist currently:\n-{table}\nAre you okay with PyMover creating these directories?"
             ),
             "Y/n",
         )
@@ -77,27 +80,31 @@ def main():
             continue
         print(yellow(file))
         matched = False
-        for m, d in regexes.items():
-            if os.path.isfile(file) and m.match(file):
+        for regex, target in regexes.items():
+            if os.path.isfile(file) and regex.match(file):
                 matched = True
-                if d == None:
+                if target is None:
                     print(yellow("--Ignored--"))
                     continue
-                if not os.path.exists(d):
-                    response = ask(green(f"Path to {d} does not exist, create?"), "Y/n")
+                if not os.path.exists(target):
+                    response = ask(
+                        green(f"Path to {target} does not exist, create?"), "Y/n"
+                    )
                     if response in YES_DEFAULT:
-                        new_dir = os.path.join(os.getcwd(), d)
+                        new_dir = os.path.join(os.getcwd(), target)
                         print(yellow(f"Creating path {new_dir}"))
                         os.mkdir(new_dir)
-                dest = os.path.join(d, file)
+                dest = os.path.join(target, file)
                 print(yellow(f"Moving {file} to {dest}"))
                 move(file, dest)
         if not matched:
             unhandled.append(file)
-    printout = "\n-".join(unhandled)
+    table = PrettyTable()
+    table.align = "l"
+    table.add_column("File", unhandled)
     print(
         green(
-            f"The follow files were not matched.\n-{printout}\nFor PyMover to handle these files please add rules to the configuration."
+            f"The follow files were not matched.\n-{table}\nFor PyMover to handle these files please add rules to the configuration file ({toml_path})."
         )
     )
 
@@ -113,7 +120,7 @@ def ask(field, default):
     return value
 
 
-if __name__ == "__main__":
+def cli():
     try:
         # Validate the config file.
         validate_config(CONFIG)
@@ -121,3 +128,7 @@ if __name__ == "__main__":
     except:
         print(red("An error occured during runtime."))
         raise
+
+
+if __name__ == "__main__":
+    cli()
