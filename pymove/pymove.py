@@ -14,8 +14,6 @@ REGEXES = {re.compile(k): v for k, v in CONFIG.items()}
 
 
 def main():
-    # Banner
-    print(green(f.renderText("PyMover")))
     print(green("Globbing the current directory.."))
     unhandled = []
     for file in glob("*"):
@@ -47,13 +45,15 @@ def main():
     table.add_column("File", unhandled)
     print(
         green(
-            f"The follow files were not matched.\n-{table}\nFor PyMover to handle these files please add rules to the configuration file ({toml_path})."
+            f"The following files were not matched.\n{table}\nFor PyMover to handle these files please add rules to the configuration file ({toml_path})."
         )
     )
 
 
 def cli():
     try:
+        # Banner
+        print(green(f.renderText("PyMover")))
         # Validate the config file.
         validate_config()
         main()

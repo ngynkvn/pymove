@@ -58,7 +58,7 @@ def validate_config():
         table.add_rows(missing)
         response = ask(
             yellow(
-                f"The following paths do not exist currently:\n-{table}\nAre you okay with PyMover creating these directories?"
+                f"The following paths do not exist currently:\n{table}\nAre you okay with PyMover creating these directories?"
             ),
             "Y/n",
         )
